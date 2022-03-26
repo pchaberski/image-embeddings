@@ -1,0 +1,10 @@
+# Local logging setings
+logging_level: 'DEBUG'
+logging_dir: 'logs'
+
+
+# Neptune settings
+log_to_neptune: False
+neptune_username: 'pchaberski'
+neptune_project: 'image-embeddings'
+neptune_api_token: '<api_token>'
