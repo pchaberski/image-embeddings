@@ -2,9 +2,11 @@
 logging_level: 'DEBUG'
 logging_dir: 'logs'
 
-
 # Neptune settings
 log_to_neptune: False
 neptune_username: 'pchaberski'
 neptune_project: 'image-embeddings'
 neptune_api_token: '<api_token>'
+
+# Data settings
+data_path: '/Users/pchaberski/data/kaggle_hm/samples/smpl_100_20220326235042'
