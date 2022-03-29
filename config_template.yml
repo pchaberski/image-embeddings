@@ -17,3 +17,6 @@ normalize: False
 normalization_params:
   mean: [0.7662, 0.7482, 0.7468]
   std: [0.2005, 0.2172, 0.2129]
+
+# Training settings
+batch_size: 32

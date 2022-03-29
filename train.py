@@ -2,6 +2,7 @@ from utils.configuration import load_config
 from utils.logger import configure_logger
 import neptune.new as neptune
 import os
+from data.hm_data_module import HMDataModule
 
 
 cfg = load_config('config.yml')
@@ -13,3 +14,15 @@ if cfg.get('log_to_neptune'):
         project=os.path.join(cfg.get('neptune_username'), cfg.get('neptune_project')),
         api_token=cfg.get('neptune_api_token')
     )
+
+
+data_module = HMDataModule(
+        data_path=cfg.get('data_path'),
+        batch_size=cfg.get('batch_size'),
+        image_size=cfg.get('image_size'),
+        normalize=cfg.get('normalize'),
+        normalization_params=cfg.get('normalization_params')
+)
+
+
+print(data_module.train_valid_ratio)
