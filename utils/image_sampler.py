@@ -67,4 +67,8 @@ def sample_images(
 
 
 if __name__ == "__main__":
-    sample_images(INPUT_DIR, OUTPUT_DIR, SAMPLE_USING_RATE, SAMPLE_RATE, NUM_SAMPLES, SEED)
+    sample_images(
+        INPUT_DIR, OUTPUT_DIR,
+        SAMPLE_USING_RATE, SAMPLE_RATE, NUM_SAMPLES,
+        MAKE_VALID, TRAIN_VALID_RATIO,
+        SEED)
