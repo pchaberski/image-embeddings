@@ -14,8 +14,8 @@ cfg = load_config('../config.yml')
 data_train = HMDataset(
     data_path=os.path.join(cfg.get('data_path'), 'train'),
     image_size=cfg.get('image_size'),
-    normalize=cfg.get('normalize'),
-    normalization_params=cfg.get('normalization_params')
+    center=cfg.get('center'),
+    center_params=cfg.get('center_params')
 )
 
 means = {
