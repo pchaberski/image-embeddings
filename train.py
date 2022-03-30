@@ -20,8 +20,8 @@ data_module = HMDataModule(
         data_path=cfg.get('data_path'),
         batch_size=cfg.get('batch_size'),
         image_size=cfg.get('image_size'),
-        normalize=cfg.get('normalize'),
-        normalization_params=cfg.get('normalization_params')
+        center=cfg.get('center'),
+        center_params=cfg.get('center_params')
 )
 
 

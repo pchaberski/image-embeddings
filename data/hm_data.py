@@ -15,14 +15,14 @@ class HMDataset(Dataset):
         self,
         data_path,
         image_size=[224, 224],
-        normalize=False,
-        normalization_params={'mean': None, 'std': None}
+        center=False,
+        center_params={'mean': None, 'std': None}
     ):
         super().__init__()
         self.data_path = data_path
         self.image_size = image_size
-        self.normalize = normalize
-        self.normalization_params = normalization_params
+        self.center = center
+        self.center_params = center_params
         self.image_fnames = self._get_image_fnames(data_path)
 
     def _get_image_fnames(self, data_path):
@@ -39,11 +39,11 @@ class HMDataset(Dataset):
         # Convert to tensor
         transf_list += [transforms.ToTensor()]
 
-        # Normalization
-        if self.normalize:
+        # Centering (optional)
+        if self.center:
             transf_list += [transforms.Normalize(
-                mean=self.normalization_params['mean'],
-                std=self.normalization_params['std']
+                mean=self.center_params['mean'],
+                std=self.center_params['std']
             )]
 
         transf = transforms.Compose(transf_list)

@@ -14,30 +14,30 @@ class HMDataModule(pl.LightningDataModule):
         data_path: str,
         batch_size: int,
         image_size=[224, 224],
-        normalize=False,
-        normalization_params={'mean': None, 'std': None}
+        center=False,
+        center_params={'mean': None, 'std': None}
     ):
         super().__init__()
         self.data_path = data_path
         self.batch_size = batch_size
         self.image_size = image_size
-        self.normalize = normalize
-        self.normalization_params = normalization_params
+        self.center = center
+        self.center_params = center_params
         self.train_valid_ratio = self._get_train_valid_ratio()
 
     def setup(self, stage='fit'):
         self.data_train = HMDataset(
             data_path=os.path.join(self.data_path, 'train'),
             image_size=self.image_size,
-            normalize=self.normalize,
-            normalization_params=self.normalization_params
+            center=self.center,
+            center_params=self.center_params
         )
 
         self.data_valid = HMDataset(
             data_path=os.path.join(self.data_path, 'valid'),
             image_size=self.image_size,
-            normalize=self.normalize,
-            normalization_params=self.normalization_params
+            center=self.center,
+            center_params=self.center_params
         )
 
     def train_dataloader(self):
