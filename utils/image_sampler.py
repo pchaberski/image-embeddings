@@ -5,7 +5,7 @@ from tqdm import tqdm
 import shutil
 
 
-INPUT_DIR = '/Users/pchaberski/data/kaggle_hm/single_folder'  # all images should be in a single folder
+INPUT_DIR = '/Users/pchaberski/data/kaggle_hm/single_folder'  # All images should be in a single folder
 OUTPUT_DIR = '/Users/pchaberski/data/kaggle_hm/samples'
 SAMPLE_USING_RATE = False  # Whether to use sample rate (0.0-1.0, if True) or absolute value of wanted samples (if False)
 SAMPLE_RATE = 0.01
@@ -71,4 +71,5 @@ if __name__ == "__main__":
         INPUT_DIR, OUTPUT_DIR,
         SAMPLE_USING_RATE, SAMPLE_RATE, NUM_SAMPLES,
         MAKE_VALID, TRAIN_VALID_RATIO,
-        SEED)
+        SEED
+    )
