@@ -132,3 +132,4 @@ logs
 config.yml
 .neptune
 lightning_logs
+.DS_Store
