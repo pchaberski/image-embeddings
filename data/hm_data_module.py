@@ -13,6 +13,7 @@ class HMDataModule(pl.LightningDataModule):
         self,
         data_path: str,
         batch_size: int,
+        num_workers = 1,
         image_size=[224, 224],
         center=False,
         center_params={'mean': None, 'std': None}
@@ -20,6 +21,7 @@ class HMDataModule(pl.LightningDataModule):
         super().__init__()
         self.data_path = data_path
         self.batch_size = batch_size
+        self.num_workers = num_workers
         self.image_size = image_size
         self.center = center
         self.center_params = center_params
@@ -41,12 +43,24 @@ class HMDataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        loader = DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True)
+        loader = DataLoader(
+            self.data_train,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            shuffle=True
+        )
 
         return loader
 
     def val_dataloader(self):
-        loader = DataLoader(self.data_valid, batch_size=self.batch_size)
+        loader = DataLoader(
+            self.data_valid,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            shuffle=False
+        )
 
         return loader
 

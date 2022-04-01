@@ -131,3 +131,4 @@ dmypy.json
 logs
 config.yml
 .neptune
+lightning_logs

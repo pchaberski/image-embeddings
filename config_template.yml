@@ -18,5 +18,15 @@ center_params:
   mean: [0.7662, 0.7482, 0.7468]
   std: [0.2005, 0.2172, 0.2129]
 
+# Optimizer settings
+optimizer: Adam  # any valid optimizer from 'torch.optim'
+optimizer_params:
+  lr: 0.001
+
 # Training settings
-batch_size: 32
+encoder: 'EncoderBase'
+decoder: 'DecoderBase'
+num_epochs: 1
+batch_size: 8
+num_gpus: 0
+num_workers: 0  # 0 if num_gpus==0
