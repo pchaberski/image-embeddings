@@ -19,14 +19,14 @@ center_params:
   std: [0.2005, 0.2172, 0.2129]
 
 # Optimizer settings
-optimizer: Adam  # any valid optimizer from 'torch.optim'
+optimizer: 'Adam'  # any valid optimizer from 'torch.optim'
 optimizer_params:
   lr: 0.001
 
 # Training settings
 encoder: 'EncoderBase'
 decoder: 'DecoderBase'
-num_epochs: 1
+num_epochs: 3
 batch_size: 8
 num_gpus: 0
 num_workers: 0  # 0 if num_gpus==0

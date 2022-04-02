@@ -6,6 +6,7 @@ from data.hm_data_module import HMDataModule
 from model.autoencoder_module import LitHMAutoEncoder
 import pytorch_lightning as pl
 from importlib import import_module
+from pytorch_lightning.loggers import NeptuneLogger
 
 
 cfg = load_config('config.yml')
@@ -34,7 +35,8 @@ model = LitHMAutoEncoder(
     optimizer=getattr(import_module('torch.optim'), cfg.get('optimizer')),
     optimizer_params=cfg.get('optimizer_params'),
     encoder=getattr(import_module('model.encoders'), cfg.get('encoder'))(cfg.get('image_size')),
-    decoder=getattr(import_module('model.decoders'), cfg.get('decoder'))(cfg.get('image_size'))
+    decoder=getattr(import_module('model.decoders'), cfg.get('decoder'))(cfg.get('image_size')),
+    run=run
 )
 
 
