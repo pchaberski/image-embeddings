@@ -42,7 +42,8 @@ model = LitHMAutoEncoder(
 
 trainer = pl.Trainer(
     max_epochs=cfg.get('num_epochs'),
-    gpus=cfg.get('num_gpus')
+    gpus=cfg.get('num_gpus'),
+    num_sanity_val_steps=0
 )
 
 
