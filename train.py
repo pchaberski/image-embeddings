@@ -57,6 +57,8 @@ settings_record = {
     'num_epochs': trainer.max_epochs,
     'num_workers': data_module.num_workers,
     'num_gpus': trainer.gpus,
+    'optimizer': cfg.get('optimizer'),
+    'optimizer_params': str(model.optimizer_params),
     'encoder': cfg.get('encoder'),
     'decoder': cfg.get('decoder')
 }
