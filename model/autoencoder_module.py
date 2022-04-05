@@ -30,8 +30,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         x = x.view(x.size(0), -1)
         z = self.encoder(x)
         x_hat = self.decoder(z)
-        if self.run:
-            loss = F.mse_loss(x_hat, x)
+        loss = F.mse_loss(x_hat, x)
         if self.run:
             self.run['metrics/batch/train_loss'].log(loss)
 
