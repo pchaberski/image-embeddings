@@ -1,4 +1,3 @@
-
 """Dateset class for H&M images."""
 
 

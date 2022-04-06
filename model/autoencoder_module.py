@@ -48,18 +48,20 @@ class LitHMAutoEncoder(pl.LightningModule):
         return {'loss': loss}
 
     def training_epoch_end(self, outputs):
-        loss = np.array([])
+        batch_losses = np.array([])
         for results_dict in outputs:
-            loss = np.append(loss, results_dict["loss"])
+            batch_losses = np.append(batch_losses, results_dict["loss"])
+        epoch_loss = batch_losses.mean()
         if self.run:
-            self.run['metrics/epoch/train_loss'].log(loss.mean())
+            self.run['metrics/epoch/train_loss'].log(epoch_loss)
 
     def validation_epoch_end(self, outputs):
-        loss = np.array([])
+        batch_losses = np.array([])
         for results_dict in outputs:
-            loss = np.append(loss, results_dict["loss"])
+            batch_losses = np.append(batch_losses, results_dict["loss"])
+        epoch_loss = batch_losses.mean()
         if self.run:
-            self.run['metrics/epoch/valid_loss'].log(loss.mean())
+            self.run['metrics/epoch/valid_loss'].log(epoch_loss)
 
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters(), **self.optimizer_params)
