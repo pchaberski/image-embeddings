@@ -6,7 +6,6 @@ from data.hm_data_module import HMDataModule
 from model.autoencoder_module import LitHMAutoEncoder
 import pytorch_lightning as pl
 from importlib import import_module
-from pytorch_lightning.loggers import NeptuneLogger
 
 
 cfg = load_config('config.yml')
