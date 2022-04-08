@@ -2,7 +2,6 @@ from utils.configuration import load_config
 from utils.logger import configure_logger
 import neptune.new as neptune
 import os
-from data.hm_data_module import HMDataModule
 from model.autoencoder_module import LitHMAutoEncoder
 import pytorch_lightning as pl
 from importlib import import_module
@@ -20,17 +19,14 @@ if cfg.get('log_to_neptune'):
     )
 
 
-data_module = HMDataModule(
+model = LitHMAutoEncoder(
+
     data_path=cfg.get('data_path'),
     batch_size=cfg.get('batch_size'),
     num_workers=cfg.get('num_workers'),
     image_size=cfg.get('image_size'),
     center=cfg.get('center'),
-    center_params=cfg.get('center_params')
-)
-
-
-model = LitHMAutoEncoder(
+    center_params=cfg.get('center_params'),
     optimizer=getattr(import_module('torch.optim'), cfg.get('optimizer')),
     optimizer_params=cfg.get('optimizer_params'),
     encoder=getattr(
@@ -53,14 +49,14 @@ trainer = pl.Trainer(
 
 
 settings_record = {
-    'data_folder': os.path.basename(data_module.data_path),
-    'image_size': data_module.image_size,
-    'center': data_module.center,
-    'center_params': str(data_module.center_params) if data_module.center else None,
-    'batch_size': data_module.batch_size,
-    'train_valid_ratio': data_module.train_valid_ratio,
+    'data_folder': os.path.basename(model.data_path),
+    'image_size': model.image_size,
+    'center': model.center,
+    'center_params': str(model.center_params) if model.center else None,
+    'batch_size': model.batch_size,
+    'train_valid_ratio': model.train_valid_ratio,
     'num_epochs': trainer.max_epochs,
-    'num_workers': data_module.num_workers,
+    'num_workers': model.num_workers,
     'num_gpus': trainer.gpus,
     'optimizer': cfg.get('optimizer'),
     'optimizer_params': str(model.optimizer_params),
@@ -72,7 +68,7 @@ if cfg.get('log_to_neptune'):
     run['settings'] = settings_record
 
 
-trainer.fit(model, data_module)
+trainer.fit(model)
 
 
 logger.info('All done.')
