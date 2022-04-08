@@ -33,8 +33,14 @@ data_module = HMDataModule(
 model = LitHMAutoEncoder(
     optimizer=getattr(import_module('torch.optim'), cfg.get('optimizer')),
     optimizer_params=cfg.get('optimizer_params'),
-    encoder=getattr(import_module('model.encoders'), cfg.get('encoder'))(cfg.get('image_size')),
-    decoder=getattr(import_module('model.decoders'), cfg.get('decoder'))(cfg.get('image_size')),
+    encoder=getattr(
+        import_module('model.encoders'),
+        cfg.get('encoder'))(cfg.get('image_size', cfg.get('embedding_size'))
+    ),
+    decoder=getattr(
+        import_module('model.decoders'),
+        cfg.get('decoder'))(cfg.get('image_size', cfg.get('embedding_size'))
+    ),
     run=run
 )
 
@@ -58,6 +64,7 @@ settings_record = {
     'num_gpus': trainer.gpus,
     'optimizer': cfg.get('optimizer'),
     'optimizer_params': str(model.optimizer_params),
+    'embedding_size': cfg.get('embedding_size'),
     'encoder': cfg.get('encoder'),
     'decoder': cfg.get('decoder')
 }

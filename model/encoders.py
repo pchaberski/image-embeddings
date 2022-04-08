@@ -9,7 +9,8 @@ class EncoderBase(nn.Module):
 
     def __init__(
         self,
-        image_size
+        image_size,
+        embedding_size: int = 32,
     ):
         super().__init__()
         self.image_size = image_size
@@ -17,7 +18,7 @@ class EncoderBase(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(self.image_size[0]*self.image_size[1]*3, 128), 
             nn.ReLU(), 
-            nn.Linear(128, 32)
+            nn.Linear(128, embedding_size)
         )
 
     def forward(self, x):

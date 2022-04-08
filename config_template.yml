@@ -24,9 +24,10 @@ optimizer_params:
   lr: 0.001
 
 # Training settings
+embedding_size: 32
 encoder: 'EncoderBase'
 decoder: 'DecoderBase'
-num_epochs: 3
+num_epochs: 1
 batch_size: 8
 num_gpus: 0
 num_workers: 0  # 0 if num_gpus==0
