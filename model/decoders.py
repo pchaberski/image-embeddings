@@ -88,7 +88,7 @@ class DecoderConvBase(nn.Module):
         return x
 
 
-class DecoderConvLin2014(nn.Module):
+class DecoderConvLin1024(nn.Module):
 
     def __init__(
         self,
