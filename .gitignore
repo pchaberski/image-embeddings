@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 logs
+output
 config.yml
 .neptune
 lightning_logs

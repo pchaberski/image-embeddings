@@ -1,3 +1,4 @@
+from fileinput import filename
 from utils.configuration import load_config
 from utils.logger import configure_logger
 import neptune.new as neptune
@@ -5,10 +6,14 @@ import os
 from model.autoencoder_module import LitHMAutoEncoder
 import pytorch_lightning as pl
 from importlib import import_module
+from datetime import datetime
 
 
 cfg = load_config('config.yml')
 logger = configure_logger(__name__, cfg.get('logging_dir'), cfg.get('logging_level'))
+
+
+run_ts = datetime.now().strftime('%Y%m%d%H%M%S')
 
 
 if cfg.get('log_to_neptune'):
@@ -35,10 +40,24 @@ model = LitHMAutoEncoder(
 )
 
 
+if not os.path.exists(cfg.get('output_path')):
+    os.makedirs(cfg.get('output_path'))
+checkpoint_path = os.path.join(cfg.get('output_path'), run_ts)
+os.makedirs(checkpoint_path)
+
+
+checkpoint_callback = pl.callbacks.ModelCheckpoint(
+    dirpath=checkpoint_path,
+    monitor='val_loss',
+    filename='model-{epoch:02d}-{val_loss:.4f}',
+)
+
+
 trainer = pl.Trainer(
     max_epochs=cfg.get('num_epochs'),
     gpus=cfg.get('num_gpus'),
-    num_sanity_val_steps=0
+    num_sanity_val_steps=0,
+    callbacks=[checkpoint_callback]
 )
 
 

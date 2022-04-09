@@ -49,6 +49,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         z = self.encoder(x)
         x_hat = self.decoder(z)
         loss = F.mse_loss(x_hat.flatten(), x.flatten())
+        self.log('loss', loss)
         if self.run:
             self.run['metrics/batch/train_loss'].log(loss)
 
@@ -59,15 +60,16 @@ class LitHMAutoEncoder(pl.LightningModule):
         z = self.encoder(x)
         x_hat = self.decoder(z)
         loss = F.mse_loss(x_hat.flatten(), x.flatten())
+        self.log('val_loss', loss)
         if self.run:
             self.run['metrics/batch/valid_loss'].log(loss)
 
-        return {'loss': loss}
+        return {'val_loss': loss}
 
     def training_epoch_end(self, outputs):
         batch_losses = np.array([])
         for results_dict in outputs:
-            batch_losses = np.append(batch_losses, results_dict["loss"])
+            batch_losses = np.append(batch_losses, results_dict['loss'])
         epoch_loss = batch_losses.mean()
         if self.run:
             self.run['metrics/epoch/train_loss'].log(epoch_loss)
@@ -75,7 +77,7 @@ class LitHMAutoEncoder(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         batch_losses = np.array([])
         for results_dict in outputs:
-            batch_losses = np.append(batch_losses, results_dict["loss"])
+            batch_losses = np.append(batch_losses, results_dict['val_loss'])
         epoch_loss = batch_losses.mean()
         if self.run:
             self.run['metrics/epoch/valid_loss'].log(epoch_loss)
