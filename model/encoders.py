@@ -12,7 +12,7 @@ class EncoderBase(nn.Module):
         embedding_size: int = 32,
     ):
         super().__init__()
-        self.image_size = [224, 224]
+        self.image_size = [128, 128]
         self.embedding_size = embedding_size
 
         self.encoder = nn.Sequential(
@@ -36,7 +36,7 @@ class EncoderConvBase(nn.Module):
     ):
 
         super().__init__()
-        self.image_size = [224, 224]
+        self.image_size = [128, 128]
         self.embedding_size = embedding_size
 
         self.encoder_conv = nn.Sequential(

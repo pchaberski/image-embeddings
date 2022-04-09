@@ -18,7 +18,7 @@ class HMDataset(Dataset):
     ):
         super().__init__()
         self.data_path = data_path
-        self.image_size = [224, 224]
+        self.image_size = [128, 128]
         self.center = center
         self.center_params = center_params
         self.image_fnames = self._get_image_fnames(data_path)

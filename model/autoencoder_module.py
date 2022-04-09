@@ -37,7 +37,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         self.center = center
         self.center_params = center_params
         self.train_valid_ratio = self._get_train_valid_ratio()
-        self.image_size = [224, 224]
+        self.image_size = [128, 128]
 
     def forward(self, x):
         embedding = self.encoder(x)
