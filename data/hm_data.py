@@ -13,13 +13,12 @@ class HMDataset(Dataset):
     def __init__(
         self,
         data_path,
-        image_size=[224, 224],
         center=False,
         center_params={'mean': None, 'std': None}
     ):
         super().__init__()
         self.data_path = data_path
-        self.image_size = image_size
+        self.image_size = [224, 224]
         self.center = center
         self.center_params = center_params
         self.image_fnames = self._get_image_fnames(data_path)

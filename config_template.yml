@@ -12,7 +12,6 @@ neptune_api_token: '<api_token>'
 data_path: '/Users/pchaberski/data/kaggle_hm/samples/smpl_1000_20220328223037'
 
 # Preprocessing settings
-image_size: [224, 224]
 center: False
 center_params:
   mean: [0.7662, 0.7482, 0.7468]

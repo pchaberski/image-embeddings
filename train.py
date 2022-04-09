@@ -17,26 +17,20 @@ if cfg.get('log_to_neptune'):
         project=os.path.join(cfg.get('neptune_username'), cfg.get('neptune_project')),
         api_token=cfg.get('neptune_api_token')
     )
+else:
+    run = None
 
 
 model = LitHMAutoEncoder(
-
     data_path=cfg.get('data_path'),
     batch_size=cfg.get('batch_size'),
     num_workers=cfg.get('num_workers'),
-    image_size=cfg.get('image_size'),
     center=cfg.get('center'),
     center_params=cfg.get('center_params'),
     optimizer=getattr(import_module('torch.optim'), cfg.get('optimizer')),
     optimizer_params=cfg.get('optimizer_params'),
-    encoder=getattr(
-        import_module('model.encoders'),
-        cfg.get('encoder'))(cfg.get('image_size', cfg.get('embedding_size'))
-    ),
-    decoder=getattr(
-        import_module('model.decoders'),
-        cfg.get('decoder'))(cfg.get('image_size', cfg.get('embedding_size'))
-    ),
+    encoder=getattr(import_module('model.encoders'), cfg.get('encoder'))(cfg.get('embedding_size')),
+    decoder=getattr(import_module('model.decoders'), cfg.get('decoder'))(cfg.get('embedding_size')),
     run=run
 )
 
@@ -50,7 +44,6 @@ trainer = pl.Trainer(
 
 settings_record = {
     'data_folder': os.path.basename(model.data_path),
-    'image_size': model.image_size,
     'center': model.center,
     'center_params': str(model.center_params) if model.center else None,
     'batch_size': model.batch_size,

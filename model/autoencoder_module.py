@@ -21,7 +21,6 @@ class LitHMAutoEncoder(pl.LightningModule):
         data_path: str,
         batch_size: int,
         num_workers = 1,
-        image_size=[224, 224],
         center=False,
         center_params={'mean': None, 'std': None},
         run = None
@@ -35,10 +34,10 @@ class LitHMAutoEncoder(pl.LightningModule):
         self.data_path = data_path
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.image_size = image_size
         self.center = center
         self.center_params = center_params
         self.train_valid_ratio = self._get_train_valid_ratio()
+        self.image_size = [224, 224]
 
     def forward(self, x):
         embedding = self.encoder(x)
@@ -47,10 +46,9 @@ class LitHMAutoEncoder(pl.LightningModule):
     
     def training_step(self, batch, batch_idx):
         x = batch
-        x = x.view(x.size(0), -1)
         z = self.encoder(x)
         x_hat = self.decoder(z)
-        loss = F.mse_loss(x_hat, x)
+        loss = F.mse_loss(x_hat.flatten(), x.flatten())
         if self.run:
             self.run['metrics/batch/train_loss'].log(loss)
 
@@ -58,10 +56,9 @@ class LitHMAutoEncoder(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x = batch
-        x = x.view(x.size(0), -1)
         z = self.encoder(x)
         x_hat = self.decoder(z)
-        loss = F.mse_loss(x_hat, x)
+        loss = F.mse_loss(x_hat.flatten(), x.flatten())
         if self.run:
             self.run['metrics/batch/valid_loss'].log(loss)
 
@@ -116,21 +113,18 @@ class LitHMAutoEncoder(pl.LightningModule):
     def setup(self, stage=None):
         self.data_train = HMDataset(
             data_path=os.path.join(self.data_path, 'train'),
-            image_size=self.image_size,
             center=self.center,
             center_params=self.center_params
         )
 
         self.data_valid = HMDataset(
             data_path=os.path.join(self.data_path, 'valid'),
-            image_size=self.image_size,
             center=self.center,
             center_params=self.center_params
         )
 
         self.data_predict = HMDataset(
             data_path=os.path.join(self.data_path, 'valid'),
-            image_size=self.image_size,
             center=self.center,
             center_params=self.center_params
         )
