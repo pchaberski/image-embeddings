@@ -29,7 +29,6 @@ model = LitHMAutoEncoder.load_from_checkpoint(
 )
 
 
-model.encoder.train(False)
 embeddings = model.calculate_embeddings(cfg.get('infer_data_path'))
 output_path = os.path.join(
     cfg.get('output_path'),
