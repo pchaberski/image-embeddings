@@ -5,6 +5,8 @@ import os
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
+import numpy as np
+import pandas as pd
 
 
 class HMDataset(Dataset):
@@ -59,4 +61,15 @@ class HMDataset(Dataset):
         image = self._transform(image)
 
         return image
+
+
+def save_embeddings(
+    embeddings: np.ndarray,
+    output_dir: str,
+    article_ids: list[str]
+):
+    colnames = ['f' + str(i + 1) for i in range(embeddings.shape[1])]
+    df_embeddings = pd.DataFrame(embeddings, columns=colnames)
+    df_embeddings.insert(0, 'article_id', article_ids)
+    df_embeddings.to_csv(output_dir)
     

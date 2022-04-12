@@ -8,31 +8,33 @@ import os
 import numpy as np
 import pandas as pd
 from neptune.new.types import File
+import torch
+from tqdm import tqdm
 
 
 class LitHMAutoEncoder(pl.LightningModule):
 
     def __init__(
         self,
-        optimizer,
-        optimizer_params,
+        batch_size: int,
         encoder,
         decoder,
-        data_path: str,
-        batch_size: int,
-        num_workers = 1,
+        num_workers = 0,
+        optimizer = None,
+        optimizer_params = None,
+        data_path: str = None,
         center=False,
         center_params={'mean': None, 'std': None},
         run = None
     ):
         super().__init__()
-        self.optimizer = optimizer
-        self.optimizer_params = optimizer_params
+        self.batch_size = batch_size
         self.encoder = encoder
         self.decoder = decoder
+        self.optimizer = optimizer
+        self.optimizer_params = optimizer_params
         self.run = run
         self.data_path = data_path
-        self.batch_size = batch_size
         self.num_workers = num_workers
         self.center = center
         self.center_params = center_params
@@ -82,7 +84,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         if self.run:
             self.run['metrics/epoch/valid_loss'].log(epoch_loss)
 
-            data_iter = iter(self.predict_dataloader())
+            data_iter = iter(self.test_dataloader())
             img_sample = data_iter.next()[:16, :, :, :]
 
             img_sample_original = torchvision.utils.make_grid(img_sample, 4, 4)
@@ -114,19 +116,18 @@ class LitHMAutoEncoder(pl.LightningModule):
 
     def setup(self, stage=None):
         self.data_train = HMDataset(
-            data_path=os.path.join(self.data_path, 'train'),
+            data_path=os.path.join(self.data_path, 'train') if self.data_path is not None else None,
             center=self.center,
             center_params=self.center_params
         )
-
         self.data_valid = HMDataset(
-            data_path=os.path.join(self.data_path, 'valid'),
+            data_path=os.path.join(self.data_path, 'valid') if self.data_path is not None else None,
             center=self.center,
             center_params=self.center_params
         )
 
-        self.data_predict = HMDataset(
-            data_path=os.path.join(self.data_path, 'valid'),
+        self.data_test = HMDataset(
+            data_path=os.path.join(self.data_path, 'valid') if self.data_path is not None else None, # only to print examples of reconstructions
             center=self.center,
             center_params=self.center_params
         )
@@ -153,9 +154,9 @@ class LitHMAutoEncoder(pl.LightningModule):
 
         return loader
 
-    def predict_dataloader(self):
+    def test_dataloader(self):
         loader = DataLoader(
-            self.data_predict,
+            self.data_test,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             pin_memory=True,
@@ -164,14 +165,43 @@ class LitHMAutoEncoder(pl.LightningModule):
 
         return loader
 
+
+    def calculate_embeddings(self, data_path):
+        self.encoder.train(False)
+
+        embeddings = torch.empty(0, self.encoder.embedding_size)
+
+        data_predict = HMDataset(
+            data_path=data_path,
+            center=self.center,
+            center_params=self.center_params
+        )
+
+        loader_predict = DataLoader(
+            data_predict,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            shuffle=False
+        )
+
+        for batch in tqdm(iter(loader_predict)):
+            embeddings_batch = self.encoder(batch.reshape(-1, 3*self.image_size[0]*self.image_size[1]))
+            embeddings = torch.cat((embeddings, embeddings_batch), dim=0)
+
+        return embeddings.detach().numpy()
+
     def _get_train_valid_ratio(self):
-        data_path_train = os.path.join(self.data_path, 'train')
-        data_path_valid = os.path.join(self.data_path, 'valid')
+        if self.data_path is not None:
+            data_path_train = os.path.join(self.data_path, 'train')
+            data_path_valid = os.path.join(self.data_path, 'valid')
 
-        jpg_fnames_train = [file for file in os.listdir(data_path_train) if file.endswith('.jpg')]
-        jpg_fnames_valid = [file for file in os.listdir(data_path_valid) if file.endswith('.jpg')]
+            jpg_fnames_train = [file for file in os.listdir(data_path_train) if file.endswith('.jpg')]
+            jpg_fnames_valid = [file for file in os.listdir(data_path_valid) if file.endswith('.jpg')]
 
-        return len(jpg_fnames_train)/(len(jpg_fnames_train) + len(jpg_fnames_valid))
+            return len(jpg_fnames_train)/(len(jpg_fnames_train) + len(jpg_fnames_valid))
+        else:
+            return None
 
     def _resize_tensor(self, tensor, height: int = 400, width: int = 400):
         transform = torchvision.transforms.Resize((height, width))

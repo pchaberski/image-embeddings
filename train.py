@@ -1,4 +1,3 @@
-from fileinput import filename
 from utils.configuration import load_config
 from utils.logger import configure_logger
 import neptune.new as neptune
@@ -11,6 +10,9 @@ from datetime import datetime
 
 cfg = load_config('config.yml')
 logger = configure_logger(__name__, cfg.get('logging_dir'), cfg.get('logging_level'))
+
+
+logger.info('Starting training procedure...')
 
 
 run_ts = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -29,20 +31,20 @@ else:
 model = LitHMAutoEncoder(
     data_path=cfg.get('data_path'),
     batch_size=cfg.get('batch_size'),
+    encoder=getattr(import_module('model.encoders'), cfg.get('encoder'))(cfg.get('embedding_size')),
+    decoder=getattr(import_module('model.decoders'), cfg.get('decoder'))(cfg.get('embedding_size')),
     num_workers=cfg.get('num_workers'),
     center=cfg.get('center'),
     center_params=cfg.get('center_params'),
     optimizer=getattr(import_module('torch.optim'), cfg.get('optimizer')),
     optimizer_params=cfg.get('optimizer_params'),
-    encoder=getattr(import_module('model.encoders'), cfg.get('encoder'))(cfg.get('embedding_size')),
-    decoder=getattr(import_module('model.decoders'), cfg.get('decoder'))(cfg.get('embedding_size')),
     run=run
 )
 
 
 if not os.path.exists(cfg.get('output_path')):
     os.makedirs(cfg.get('output_path'))
-checkpoint_path = os.path.join(cfg.get('output_path'), run_ts)
+checkpoint_path = os.path.join(cfg.get('output_path'), 'model' + run_ts)
 os.makedirs(checkpoint_path)
 
 
@@ -74,7 +76,8 @@ settings_record = {
     'optimizer_params': str(model.optimizer_params),
     'embedding_size': cfg.get('embedding_size'),
     'encoder': cfg.get('encoder'),
-    'decoder': cfg.get('decoder')
+    'decoder': cfg.get('decoder'),
+    'model_id': run_ts
 }
 if cfg.get('log_to_neptune'):
     run['settings'] = settings_record
