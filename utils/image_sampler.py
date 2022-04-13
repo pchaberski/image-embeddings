@@ -7,6 +7,8 @@ import shutil
 
 INPUT_DIR = '/Users/pchaberski/data/kaggle_hm/single_folder'  # All images should be in a single folder
 OUTPUT_DIR = '/Users/pchaberski/data/kaggle_hm/samples'
+# INPUT_DIR = 'C:/Users/pchaberski/projects/data/kaggle_hm/single_folder'  # All images should be in a single folder
+# OUTPUT_DIR = 'C:/Users/pchaberski/projects/data/kaggle_hm/samples'
 SAMPLE_USING_RATE = False  # Whether to use sample rate (0.0-1.0, if True) or absolute value of wanted samples (if False)
 SAMPLE_RATE = 0.01
 NUM_SAMPLES = 1000

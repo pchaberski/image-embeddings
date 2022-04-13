@@ -1,7 +1,7 @@
 # image-embeddings
 
 ```
-$ conda create -n image-embeddings
+$ conda create -n image-embeddings python=3.9
 $ conda activate image-embeddings
 $ pip install -r requirements-dev.txt
 $ pip install -r requirements.txt

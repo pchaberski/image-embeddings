@@ -7,3 +7,5 @@ scikit-learn~=1.0.2
 pyyaml==6.0
 tqdm>=4.63.1
 neptune-client~=0.15.2
+# Uncomment extra index in the next line below to install PyTorch with GPU support on Windows with CUDA 11.3
+--extra-index-url https://download.pytorch.org/whl/cu113

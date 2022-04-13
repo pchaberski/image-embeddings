@@ -71,7 +71,7 @@ class LitHMAutoEncoder(pl.LightningModule):
     def training_epoch_end(self, outputs):
         batch_losses = np.array([])
         for results_dict in outputs:
-            batch_losses = np.append(batch_losses, results_dict['loss'])
+            batch_losses = np.append(batch_losses, results_dict['loss'].cpu())
         epoch_loss = batch_losses.mean()
         if self.run:
             self.run['metrics/epoch/train_loss'].log(epoch_loss)
@@ -79,7 +79,7 @@ class LitHMAutoEncoder(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         batch_losses = np.array([])
         for results_dict in outputs:
-            batch_losses = np.append(batch_losses, results_dict['val_loss'])
+            batch_losses = np.append(batch_losses, results_dict['val_loss'].cpu())
         epoch_loss = batch_losses.mean()
         if self.run:
             self.run['metrics/epoch/valid_loss'].log(epoch_loss)
@@ -87,17 +87,25 @@ class LitHMAutoEncoder(pl.LightningModule):
             data_iter = iter(self.test_dataloader())
             img_sample = data_iter.next()[:16, :, :, :]
 
+            if torch.cuda.memory_allocated(0) > 0:
+                img_sample = img_sample.cuda()
+
             img_sample_original = torchvision.utils.make_grid(img_sample, 4, 4)
             img_sample_original_resized = self._resize_tensor(img_sample_original)
 
             self.encoder.train(False)
             self.decoder.train(False)
 
-            embeddings = self.encoder(img_sample.reshape(16, 3*self.image_size[0]*self.image_size[1]))
+            embeddings = self.encoder(img_sample.reshape(-1, 3*self.image_size[0]*self.image_size[1]))
 
-            img_sample_decoded = self.decoder(embeddings).reshape(16, 3, self.image_size[0], self.image_size[1])
+            img_sample_decoded = self.decoder(embeddings).reshape(-1, 3, self.image_size[0], self.image_size[1])
             img_sample_reconstructed = torchvision.utils.make_grid(img_sample_decoded, 4, 4)
             img_sample_reconstructed_resized = self._resize_tensor(img_sample_reconstructed)
+
+            if torch.cuda.memory_allocated(0) > 0:
+                img_sample_original_resized = img_sample_original_resized.cpu()
+                img_sample_reconstructed_resized = img_sample_reconstructed_resized.cpu()
+                embeddings = embeddings.cpu()
 
             img_sample_original_resized_np_t = np.transpose(img_sample_original_resized.numpy(), (1, 2, 0))
             img_sample_reconstructed_resized_np_t = np.transpose(img_sample_reconstructed_resized.numpy(), (1, 2, 0))
@@ -203,7 +211,10 @@ class LitHMAutoEncoder(pl.LightningModule):
         else:
             return None
 
-    def _resize_tensor(self, tensor, height: int = 400, width: int = 400):
+    def _resize_tensor(self, tensor, width: int = 400):
+        h_w_ratio = tensor.shape[1] / tensor.shape[2]
+        height = int(h_w_ratio*width)
+
         transform = torchvision.transforms.Resize((height, width))
         resized_tensor = transform(tensor)
 

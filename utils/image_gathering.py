@@ -5,6 +5,8 @@ from tqdm import tqdm
 
 INPUT_DIR = '/Users/pchaberski/data/kaggle_hm/original'
 OUTPUT_DIR = '/Users/pchaberski/data/kaggle_hm/single_folder'
+# INPUT_DIR = 'C:/Users/pchaberski/projects/data/kaggle_hm/images'
+# OUTPUT_DIR = 'C:/Users/pchaberski/projects/data/kaggle_hm/single_folder'
 
 
 def gather_to_one_folder(input_dir, output_dir):
