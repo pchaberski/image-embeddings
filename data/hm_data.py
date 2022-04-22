@@ -65,11 +65,17 @@ class HMDataset(Dataset):
 
 def save_embeddings(
     embeddings: np.ndarray,
-    output_dir: str,
-    article_ids: list[str]
+    output_path: str,
+    article_ids: list[str],
+    to_parquet: bool = False  # csv or parquet
 ):
     colnames = ['f' + str(i + 1) for i in range(embeddings.shape[1])]
     df_embeddings = pd.DataFrame(embeddings, columns=colnames)
     df_embeddings.insert(0, 'article_id', article_ids)
-    df_embeddings.to_csv(output_dir, index=False)
+    if to_parquet:
+        output_fpath = os.path.join(output_path, 'embeddings.parquet')
+        df_embeddings.to_parquet(output_fpath, index=False)
+    else:
+        output_fpath = os.path.join(output_path, 'embeddings.csv')
+        df_embeddings.to_csv(output_fpath, index=False)
     

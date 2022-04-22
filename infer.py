@@ -31,9 +31,13 @@ def main(run_ts):
         'embeddings' + run_ts + '_model' + os.path.basename(cfg.get('infer_model_path'))
     )
     os.makedirs(output_path)
-    outputn_fpath = os.path.join(output_path, 'embeddings.csv')
     article_ids = [x.split('.')[0] for x in os.listdir(cfg.get('infer_data_path'))]
-    save_embeddings(embeddings, outputn_fpath, article_ids=article_ids)
+    save_embeddings(
+        embeddings,
+        output_path,
+        article_ids=article_ids,
+        to_parquet=True
+    )
 
     logger.info('All done.')
 
