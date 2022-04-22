@@ -177,7 +177,7 @@ class LitHMAutoEncoder(pl.LightningModule):
     def calculate_embeddings(self, data_path):
         self.encoder.train(False)
 
-        embeddings = torch.empty(0, self.encoder.embedding_size)
+        embeddings = np.empty((0, self.encoder.embedding_size))
 
         data_predict = HMDataset(
             data_path=data_path,
@@ -189,15 +189,16 @@ class LitHMAutoEncoder(pl.LightningModule):
             data_predict,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            pin_memory=True,
+            pin_memory=False,
             shuffle=False
         )
 
         for batch in tqdm(iter(loader_predict)):
             embeddings_batch = self.encoder(batch.reshape(-1, 3*self.image_size[0]*self.image_size[1]))
-            embeddings = torch.cat((embeddings, embeddings_batch), dim=0)
+            embeddings_batch = embeddings_batch.detach().numpy()
+            embeddings = np.concatenate((embeddings, embeddings_batch), axis=0)
 
-        return embeddings.detach().numpy()
+        return embeddings
 
     def _get_train_valid_ratio(self):
         if self.data_path is not None:
