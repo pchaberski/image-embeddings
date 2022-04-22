@@ -71,5 +71,5 @@ def save_embeddings(
     colnames = ['f' + str(i + 1) for i in range(embeddings.shape[1])]
     df_embeddings = pd.DataFrame(embeddings, columns=colnames)
     df_embeddings.insert(0, 'article_id', article_ids)
-    df_embeddings.to_csv(output_dir)
+    df_embeddings.to_csv(output_dir, index=False)
     
