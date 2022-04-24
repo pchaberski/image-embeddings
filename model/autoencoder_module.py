@@ -117,6 +117,10 @@ class LitHMAutoEncoder(pl.LightningModule):
             self.encoder.train(True)
             self.decoder.train(True)
 
+    def on_train_epoch_start(self):
+        if self.run:
+            self.run['curr_epoch'] = self.current_epoch
+
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters(), **self.optimizer_params)
 
@@ -199,6 +203,23 @@ class LitHMAutoEncoder(pl.LightningModule):
             embeddings = np.concatenate((embeddings, embeddings_batch), axis=0)
 
         return embeddings
+
+    def get_num_params(self):
+        total_params_encoder = sum(p.numel() for p in self.encoder.parameters())
+        trainable_params_encoder = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
+        total_params_decoder = sum(p.numel() for p in self.decoder.parameters())
+        trainable_params_decoder = sum(p.numel() for p in self.decoder.parameters() if p.requires_grad)
+
+        num_params = {
+            'total': total_params_encoder + total_params_decoder,
+            'total_trainable': trainable_params_encoder + trainable_params_decoder,
+            'encoder': total_params_encoder,
+            'encoder_trainable': trainable_params_encoder,
+            'decoder': total_params_decoder,
+            'decoder_trainable': trainable_params_decoder 
+        }
+
+        return num_params
 
     def _get_train_valid_ratio(self):
         if self.data_path is not None:

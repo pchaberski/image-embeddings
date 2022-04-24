@@ -72,7 +72,7 @@ def main(run_ts):
         'embedding_size': cfg.get('embedding_size'),
         'encoder': cfg.get('encoder'),
         'decoder': cfg.get('decoder'),
-        'model_id': run_ts
+        'num_params': model.get_num_params()
     }
     if cfg.get('log_to_neptune'):
         run['settings'] = settings_record
