@@ -26,8 +26,12 @@ center_params:
 
 # Optimizer settings
 optimizer: 'Adam'  # any valid optimizer from 'torch.optim'
-optimizer_params:
+optimizer_params:  # optimizer parameters to be passed as '**dict'
   lr: 0.001
+lr_scheduler: MultiStepLR  # valid lr_scheduler from 'torch.optim' or None
+lr_scheduler_params:  # scheduler parameters to be passed as '**dict'
+  gamma: 0.1
+  milestones: [20, 30]
 
 # Training settings
 embedding_size: 32

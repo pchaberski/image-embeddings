@@ -36,6 +36,8 @@ def main(run_ts):
         center_params=cfg.get('center_params'),
         optimizer=getattr(import_module('torch.optim'), cfg.get('optimizer')),
         optimizer_params=cfg.get('optimizer_params'),
+        lr_scheduler=getattr(import_module('torch.optim.lr_scheduler'), cfg.get('lr_scheduler')),
+        lr_scheduler_params=cfg.get('lr_scheduler_params'),
         run=run
     )
 
@@ -51,11 +53,19 @@ def main(run_ts):
         filename='model-{epoch:02d}-{val_loss:.4f}',
     )
 
+    early_stop_callback = pl.callbacks.early_stopping.EarlyStopping(
+        monitor='val_loss',
+        min_delta=0.00001,
+        patience=5,
+        verbose=True,
+        mode='min'
+    )
+
     trainer = pl.Trainer(
         max_epochs=cfg.get('num_epochs'),
         gpus=cfg.get('num_gpus'),
         num_sanity_val_steps=0,
-        callbacks=[checkpoint_callback]
+        callbacks=[checkpoint_callback, early_stop_callback]
     )
 
     settings_record = {
@@ -69,6 +79,8 @@ def main(run_ts):
         'num_gpus': trainer.gpus,
         'optimizer': cfg.get('optimizer'),
         'optimizer_params': str(model.optimizer_params),
+        'optimizer': cfg.get('lr_scheduler'),
+        'optimizer_params': str(model.lr_scheduler_params),
         'embedding_size': cfg.get('embedding_size'),
         'encoder': cfg.get('encoder'),
         'decoder': cfg.get('decoder'),

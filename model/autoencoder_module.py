@@ -22,6 +22,8 @@ class LitHMAutoEncoder(pl.LightningModule):
         num_workers = 0,
         optimizer = None,
         optimizer_params = None,
+        lr_scheduler=None,
+        lr_scheduler_params=None,
         data_path: str = None,
         center=False,
         center_params={'mean': None, 'std': None},
@@ -33,6 +35,8 @@ class LitHMAutoEncoder(pl.LightningModule):
         self.decoder = decoder
         self.optimizer = optimizer
         self.optimizer_params = optimizer_params
+        self.lr_scheduler = lr_scheduler
+        self.lr_scheduler_params = lr_scheduler_params
         self.run = run
         self.data_path = data_path
         self.num_workers = num_workers
@@ -120,11 +124,19 @@ class LitHMAutoEncoder(pl.LightningModule):
     def on_train_epoch_start(self):
         if self.run:
             self.run['curr_epoch'] = self.current_epoch
+            self.run['settings/curr_lr'].log(self.optimizers().param_groups[0]['lr'])
 
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters(), **self.optimizer_params)
 
-        return optimizer
+        if self.lr_scheduler is None:
+            return [optimizer]
+        else:
+            scheduler = {
+                'scheduler': self.lr_scheduler(optimizer, **self.lr_scheduler_params),
+                'name': 'lr'
+            }
+            return [optimizer], [scheduler]
 
     def setup(self, stage=None):
         self.data_train = HMDataset(
