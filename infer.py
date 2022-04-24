@@ -16,7 +16,7 @@ def main(run_ts):
 
     logger.info(f'Loading model from: {cfg.get("infer_model_path")}')
     infer_model_fpath = os.path.join(cfg.get('infer_model_path'), os.listdir(cfg.get('infer_model_path'))[0])
-    print(infer_model_fpath)
+
     model = LitHMAutoEncoder.load_from_checkpoint(
         infer_model_fpath,
         batch_size=cfg.get('batch_size'),
