@@ -25,18 +25,18 @@ def main(run_ts):
         num_workers=cfg.get('num_workers')
     )
 
-    embeddings = model.calculate_embeddings(cfg.get('infer_data_path'))
+    embeddings, article_ids = model.calculate_embeddings(cfg.get('infer_data_path'))
     output_path = os.path.join(
         cfg.get('output_path'),
-        'embeddings' + run_ts + '_model' + os.path.basename(cfg.get('infer_model_path'))
+        'embeddings' + run_ts + '_' + os.path.basename(cfg.get('infer_model_path'))
     )
     os.makedirs(output_path)
-    article_ids = [x.split('.')[0] for x in os.listdir(cfg.get('infer_data_path'))]
+
     save_embeddings(
         embeddings,
         output_path,
         article_ids=article_ids,
-        to_parquet=True
+        to_parquet=cfg.get('save_as_parquet')
     )
 
     logger.info('All done.')

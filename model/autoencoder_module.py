@@ -51,7 +51,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         return embedding
     
     def training_step(self, batch, batch_idx):
-        x = batch
+        x, _ = batch
         z = self.encoder(x)
         x_hat = self.decoder(z)
         loss = F.mse_loss(x_hat.flatten(), x.flatten())
@@ -62,7 +62,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         return {'loss': loss}
 
     def validation_step(self, batch, batch_idx):
-        x = batch
+        x, _ = batch
         z = self.encoder(x)
         x_hat = self.decoder(z)
         loss = F.mse_loss(x_hat.flatten(), x.flatten())
@@ -89,7 +89,9 @@ class LitHMAutoEncoder(pl.LightningModule):
             self.run['metrics/epoch/valid_loss'].log(epoch_loss)
 
             data_iter = iter(self.test_dataloader())
-            img_sample = data_iter.next()[:16, :, :, :]
+            batch = data_iter.next()
+            img_batch, _ = batch
+            img_sample = img_batch[:16, :, :, :]
 
             if torch.cuda.memory_allocated(0) > 0:
                 img_sample = img_sample.cuda()
@@ -194,6 +196,7 @@ class LitHMAutoEncoder(pl.LightningModule):
         self.encoder.train(False)
 
         embeddings = np.empty((0, self.encoder.embedding_size))
+        article_ids = []
 
         data_predict = HMDataset(
             data_path=data_path,
@@ -209,12 +212,13 @@ class LitHMAutoEncoder(pl.LightningModule):
             shuffle=False
         )
 
-        for batch in tqdm(iter(loader_predict)):
-            embeddings_batch = self.encoder(batch.reshape(-1, 3*self.image_size[0]*self.image_size[1]))
+        for img_batch, ids_batch in tqdm(iter(loader_predict)):
+            embeddings_batch = self.encoder(img_batch.reshape(-1, 3*self.image_size[0]*self.image_size[1]))
             embeddings_batch = embeddings_batch.detach().numpy()
             embeddings = np.concatenate((embeddings, embeddings_batch), axis=0)
+            article_ids = article_ids + list(ids_batch)
 
-        return embeddings
+        return embeddings, article_ids
 
     def get_num_params(self):
         total_params_encoder = sum(p.numel() for p in self.encoder.parameters())

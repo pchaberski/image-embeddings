@@ -14,6 +14,7 @@ data_path: '/Users/pchaberski/data/kaggle_hm/samples/smpl_1000_20220328223037'
 # Inference settings
 infer_data_path: '/Users/pchaberski/data/kaggle_hm/single_folder'
 infer_model_path: '/Users/pchaberski/projects/image-embeddings/output/model20220412022920'
+save_as_parquet: True
 
 # Output settings
 output_path: 'output'

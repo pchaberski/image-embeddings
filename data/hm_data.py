@@ -60,13 +60,15 @@ class HMDataset(Dataset):
 
         image = self._transform(image)
 
-        return image
+        article_id = image_fname.split('.')[0]
+
+        return image, article_id
 
 
 def save_embeddings(
     embeddings: np.ndarray,
     output_path: str,
-    article_ids: list[str],
+    article_ids: list,
     to_parquet: bool = False  # csv or parquet
 ):
     colnames = ['f' + str(i + 1) for i in range(embeddings.shape[1])]
