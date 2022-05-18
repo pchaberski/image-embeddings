@@ -337,3 +337,39 @@ class DecoderConvLarger2Kernels(nn.Module):
         x = torch.sigmoid(x)
 
         return x
+
+
+class DecoderConvLarger2KernelsLeaky(nn.Module):
+
+    def __init__(
+        self,
+        embedding_size: int = 32,
+    ):
+        super().__init__()
+        self.image_size = [128, 128]
+        self.embedding_size = embedding_size
+
+        self.decoder_lin = nn.Sequential(
+            nn.Linear(self.embedding_size, 7200),
+            nn.LeakyReLU()
+        )
+
+        self.unflatten = nn.Unflatten(
+            dim=1, 
+            unflattened_size=(32, 15, 15)
+        )
+
+        self.decoder_conv = nn.Sequential(
+            nn.ConvTranspose2d(32, 64, 4, stride = 2),
+            nn.ConvTranspose2d(64, 128, 2, stride = 2),
+            nn.ConvTranspose2d(128, 3, 2, stride = 2)
+        )
+
+    def forward(self, x):
+        x = self.decoder_lin(x)
+        x = self.unflatten(x)
+        x = self.decoder_conv(x)
+        x = torch.sigmoid(x)
+
+        return x
+
